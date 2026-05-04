@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Análise Desenrola Brasil — Dra. Lucielli Viola</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --preto: #0c0c0c;
+    --branco: #f4f1ec;
+    --dourado: #c9a84c;
+    --dourado-claro: #e8c97a;
+    --verde: #27ae60;
+    --amarelo: #e67e22;
+    --vermelho: #c0392b;
+    --cinza-escuro: #1a1a1a;
+    --cinza-borda: rgba(255,255,255,0.08);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--preto);
+    color: var(--branco);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px 80px;
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: 48px;
+    animation: fadeIn 0.6s ease both;
+    max-width: 620px;
+  }
+
+  .badge {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--dourado), var(--dourado-claro));
+    color: var(--preto);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    padding: 7px 18px;
+    border-radius: 2px;
+    margin-bottom: 20px;
+  }
+
+  .header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.8rem, 5vw, 2.8rem);
+    font-weight: 900;
+    line-height: 1.1;
+    margin-bottom: 12px;
+  }
+
+  .header h1 em { font-style: italic; color: var(--dourado); }
+
+  .header p {
+    font-size: 0.95rem;
+    color: #777;
+    font-weight: 300;
+    line-height: 1.6;
+  }
+
+  /* PROGRESS */
+  .progress-wrap {
+    width: 100%;
+    max-width: 620px;
+    margin-bottom: 28px;
+    animation: fadeIn 0.5s ease 0.1s both;
+  }
+
+  .progress-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: #444;
+    margin-bottom: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .progress-bar {
+    height: 3px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--dourado), var(--dourado-claro));
+    border-radius: 2px;
+    transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  /* CARD */
+  .card {
+    width: 100%;
+    max-width: 620px;
+    background: var(--cinza-escuro);
+    border: 1px solid var(--cinza-borda);
+    border-radius: 8px;
+    padding: 40px 36px;
+    animation: slideIn 0.4s cubic-bezier(0.4,0,0.2,1) both;
+  }
+
+  @media(max-width:480px){ .card { padding: 28px 20px; } }
+
+  .step-num {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--dourado);
+    margin-bottom: 14px;
+  }
+
+  .pergunta {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.2rem, 3vw, 1.6rem);
+    font-weight: 700;
+    line-height: 1.25;
+    margin-bottom: 8px;
+  }
+
+  .pergunta-sub {
+    font-size: 0.87rem;
+    color: #666;
+    margin-bottom: 28px;
+    line-height: 1.55;
+  }
+
+  .opcoes {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .opcao {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 15px 18px;
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: transparent;
+    text-align: left;
+    color: var(--branco);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.92rem;
+    width: 100%;
+  }
+
+  .opcao:hover { border-color: var(--dourado); background: rgba(201,168,76,0.05); transform: translateX(3px); }
+  .opcao.selecionada { border-color: var(--dourado); background: rgba(201,168,76,0.09); }
+
+  .opcao-letra {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    flex-shrink: 0;
+    color: #555;
+    transition: all 0.2s;
+  }
+
+  .opcao.selecionada .opcao-letra {
+    background: linear-gradient(135deg, var(--dourado), var(--dourado-claro));
+    border-color: transparent;
+    color: var(--preto);
+  }
+
+  .alerta-inline {
+    margin-top: 14px;
+    padding: 13px 16px;
+    border-radius: 4px;
+    font-size: 0.84rem;
+    line-height: 1.55;
+    display: none;
+  }
+
+  .alerta-inline.show { display: block; }
+  .alerta-inline.atencao { background: rgba(230,126,34,0.09); border-left: 3px solid var(--amarelo); color: #e8a96a; }
+  .alerta-inline.perigo  { background: rgba(192,57,43,0.09);  border-left: 3px solid var(--vermelho); color: #e88; }
+  .alerta-inline.ok      { background: rgba(39,174,96,0.09);  border-left: 3px solid var(--verde);    color: #7dcea0; }
+  .alerta-inline.info    { background: rgba(201,168,76,0.09);  border-left: 3px solid var(--dourado);  color: var(--dourado-claro); }
+
+  .btn-proximo {
+    width: 100%;
+    margin-top: 24px;
+    padding: 17px;
+    background: linear-gradient(135deg, var(--dourado), var(--dourado-claro));
+    color: var(--preto);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.92rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(8px);
+  }
+
+  .btn-proximo.visivel { opacity: 1; pointer-events: all; transform: translateY(0); }
+  .btn-proximo:hover { box-shadow: 0 8px 28px rgba(201,168,76,0.3); transform: translateY(-2px); }
+
+  /* RESULTADO */
+  .resultado { width: 100%; max-width: 620px; display: none; animation: slideIn 0.5s ease both; }
+  .resultado.show { display: block; }
+
+  .resultado-topo {
+    border-radius: 8px 8px 0 0;
+    padding: 40px 36px 32px;
+    text-align: center;
+  }
+
+  .resultado-topo.verde   { background: linear-gradient(135deg,#0d2b1a,#0e2219); border:1px solid rgba(39,174,96,0.2); }
+  .resultado-topo.amarelo { background: linear-gradient(135deg,#2b1e0d,#261b0d); border:1px solid rgba(230,126,34,0.2); }
+  .resultado-topo.vermelho{ background: linear-gradient(135deg,#2b0d0d,#240d0d); border:1px solid rgba(192,57,43,0.2); }
+
+  .resultado-emoji { font-size: 3rem; margin-bottom: 16px; }
+
+  .resultado-titulo {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.3rem, 3.5vw, 1.9rem);
+    font-weight: 700;
+    margin-bottom: 12px;
+    line-height: 1.2;
+  }
+
+  .resultado-topo.verde   .resultado-titulo { color: #7dcea0; }
+  .resultado-topo.amarelo .resultado-titulo { color: #e8a96a; }
+  .resultado-topo.vermelho .resultado-titulo { color: #e88; }
+
+  .resultado-sub { font-size: 0.92rem; color: #999; line-height: 1.6; max-width: 480px; margin: 0 auto; }
+
+  .resultado-corpo {
+    background: var(--cinza-escuro);
+    border: 1px solid var(--cinza-borda);
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    padding: 32px 36px;
+  }
+
+  @media(max-width:480px){
+    .resultado-topo { padding: 28px 20px 24px; }
+    .resultado-corpo { padding: 24px 20px; }
+  }
+
+  .secao-titulo {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--dourado);
+    margin-bottom: 14px;
+  }
+
+  .secao { margin-bottom: 28px; }
+
+  /* DIAGNÓSTICO */
+  .diagnostico-lista {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 0;
+  }
+
+  .diagnostico-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 13px 16px;
+    border-radius: 5px;
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+
+  .diagnostico-item.ok     { background: rgba(39,174,96,0.07);  border: 1px solid rgba(39,174,96,0.15); color: #aaa; }
+  .diagnostico-item.aviso  { background: rgba(230,126,34,0.07); border: 1px solid rgba(230,126,34,0.15); color: #aaa; }
+  .diagnostico-item.risco  { background: rgba(192,57,43,0.07);  border: 1px solid rgba(192,57,43,0.15); color: #aaa; }
+  .diagnostico-item.info   { background: rgba(201,168,76,0.07); border: 1px solid rgba(201,168,76,0.15); color: #aaa; }
+
+  .diag-icone { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+  .diag-texto strong { display: block; font-weight: 600; color: var(--branco); margin-bottom: 3px; font-size: 0.9rem; }
+
+  /* PASSOS */
+  .passo-lista { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+
+  .passo-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    font-size: 0.9rem;
+    color: #bbb;
+    line-height: 1.55;
+  }
+
+  .passo-num {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: rgba(201,168,76,0.12);
+    border: 1px solid rgba(201,168,76,0.25);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.7rem; font-weight: 700; color: var(--dourado);
+    flex-shrink: 0; margin-top: 2px;
+  }
+
+  /* AVISO JURÍDICO */
+  .aviso-juridico {
+    background: rgba(192,57,43,0.07);
+    border: 1px solid rgba(192,57,43,0.18);
+    border-radius: 5px;
+    padding: 16px 18px;
+    font-size: 0.86rem;
+    color: #aaa;
+    line-height: 1.6;
+    margin-bottom: 24px;
+  }
+
+  .aviso-juridico strong { color: #e88; }
+
+  /* FGTS CALC */
+  .fgts-box {
+    background: rgba(201,168,76,0.06);
+    border: 1px solid rgba(201,168,76,0.15);
+    border-radius: 5px;
+    padding: 16px 18px;
+    font-size: 0.86rem;
+    color: #aaa;
+    line-height: 1.6;
+    margin-bottom: 24px;
+  }
+
+  .fgts-box strong { color: var(--dourado-claro); }
+
+  /* BOTÕES */
+  .btn-whats {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    width: 100%; padding: 18px;
+    background: #25D366; color: #fff;
+    font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 700;
+    border: none; border-radius: 4px; cursor: pointer;
+    text-decoration: none; transition: all 0.2s; margin-bottom: 10px;
+  }
+
+  .btn-whats:hover { background: #1ebe5d; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(37,211,102,0.25); }
+
+  .btn-secundario {
+    display: block; text-align: center; width: 100%; padding: 14px;
+    background: transparent; color: #555;
+    font-family: 'DM Sans', sans-serif; font-size: 0.85rem;
+    border: 1px solid rgba(255,255,255,0.07); border-radius: 4px;
+    cursor: pointer; text-decoration: none; transition: all 0.2s;
+  }
+
+  .btn-secundario:hover { border-color: var(--dourado); color: var(--dourado); }
+
+  .rodape {
+    margin-top: 24px; padding-top: 20px;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    text-align: center; font-size: 0.76rem; color: #383838;
+    line-height: 1.7;
+  }
+
+  @keyframes fadeIn  { from{opacity:0} to{opacity:1} }
+  @keyframes slideIn { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+</style>
+</head>
+<body>
+
+<div class="header" id="header">
+  <div class="badge">Novo Desenrola Brasil — Lançado Hoje</div>
+  <h1>Antes de ir pro banco,<br><em>descubra sua situação real</em></h1>
+  <p>Responda as perguntas abaixo e receba uma análise personalizada com base jurídica — o que o banco não vai te explicar antes de você assinar.</p>
+</div>
+
+<div class="progress-wrap" id="progressWrap">
+  <div class="progress-info">
+    <span id="progressLabel">Pergunta 1 de 10</span>
+    <span id="progressPct">0%</span>
+  </div>
+  <div class="progress-bar">
+    <div class="progress-fill" id="progressFill" style="width:0%"></div>
+  </div>
+</div>
+
+<div class="card" id="quizCard">
+  <div class="step-num" id="stepNum"></div>
+  <div class="pergunta" id="pergunta"></div>
+  <div class="pergunta-sub" id="perguntaSub"></div>
+  <div class="opcoes" id="opcoes"></div>
+  <div class="alerta-inline" id="alertaInline"></div>
+  <button class="btn-proximo" id="btnProximo" onclick="avancar()">Próxima →</button>
+</div>
+
+<div class="resultado" id="resultado"></div>
+
+<script>
+const perguntas = [
+  {
+    id: 'renda',
+    texto: 'Qual é a sua renda mensal?',
+    sub: 'Some salário, aposentadoria, benefícios e qualquer outro rendimento regular.',
+    opcoes: [
+      { l:'A', t:'Até R$ 7.240 (até 5 salários mínimos)', v:'ok' },
+      { l:'B', t:'Entre R$ 7.240 e R$ 12.000', v:'atencao' },
+      { l:'C', t:'Acima de R$ 12.000', v:'fora' },
+    ],
+    alertas: {
+      ok: { tipo:'ok', msg:'✅ Sua renda está dentro do limite do programa.' },
+      atencao: { tipo:'atencao', msg:'⚠️ Você está acima do limite previsto. O programa prioriza renda até 5 salários mínimos — aguarde a regulamentação oficial para confirmar se haverá exceções.' },
+      fora: { tipo:'perigo', msg:'❌ O Desenrola é voltado para renda até 5 salários mínimos. Com essa renda, provavelmente você não se enquadra.' },
+    }
+  },
+  {
+    id: 'tipo_divida',
+    texto: 'Qual é o tipo principal da sua dívida?',
+    sub: 'Escolha a que representa o maior valor ou a que mais pesa no seu orçamento.',
+    opcoes: [
+      { l:'A', t:'Cartão de crédito ou crédito rotativo', v:'cartao' },
+      { l:'B', t:'Cheque especial', v:'cheque' },
+      { l:'C', t:'Empréstimo pessoal ou CDC', v:'pessoal' },
+      { l:'D', t:'FIES (financiamento estudantil)', v:'fies' },
+      { l:'E', t:'Crédito consignado ou RMC/RCC', v:'consignado' },
+    ],
+    alertas: {
+      cartao: { tipo:'ok', msg:'✅ Cartão de crédito é exatamente o foco principal do Desenrola.' },
+      cheque: { tipo:'ok', msg:'✅ Cheque especial está previsto no programa.' },
+      pessoal: { tipo:'ok', msg:'✅ Empréstimo pessoal e CDC entram no programa.' },
+      fies: { tipo:'atencao', msg:'⚠️ FIES entra — mas apenas para quem já está inserido no mercado de trabalho. Isso será verificado nas próximas perguntas.' },
+      consignado: { tipo:'perigo', msg:'❌ Crédito consignado e RMC/RCC NÃO entram no Desenrola. Mas atenção: se houver juros abusivos ou irregularidade no seu contrato, a revisão judicial pode ser muito mais vantajosa do que qualquer desconto do programa.' },
+    }
+  },
+  {
+    id: 'valor_divida',
+    texto: 'Qual é o valor aproximado total da sua dívida?',
+    sub: 'Considere o valor atual cobrado pelo banco, incluindo juros e encargos.',
+    opcoes: [
+      { l:'A', t:'Até R$ 3.000', v:'baixo' },
+      { l:'B', t:'De R$ 3.000 a R$ 10.000', v:'medio' },
+      { l:'C', t:'De R$ 10.000 a R$ 30.000', v:'alto' },
+      { l:'D', t:'Acima de R$ 30.000', v:'muito_alto' },
+    ],
+    alertas: {
+      baixo: { tipo:'info', msg:'💡 Para dívidas menores, o Desenrola pode ser uma boa saída rápida — mas verifique se o desconto real compensa antes de assinar.' },
+      medio: { tipo:'info', msg:'💡 Nessa faixa vale comparar: o desconto do Desenrola vs. o que você teria direito judicialmente, especialmente se houver irregularidade no contrato.' },
+      alto: { tipo:'atencao', msg:'⚠️ Com dívidas nesse valor, uma análise cuidadosa do contrato é fundamental antes de qualquer acordo. Um erro aqui pode custar caro.' },
+      muito_alto: { tipo:'atencao', msg:'⚠️ Dívidas acima de R$ 30.000 merecem atenção jurídica redobrada. O desconto do Desenrola pode parecer atraente, mas pode encerrar direitos ainda mais valiosos.' },
+    }
+  },
+  {
+    id: 'atraso',
+    texto: 'Há quanto tempo essa dívida está em atraso?',
+    sub: 'Conte a partir do mês em que você parou de pagar.',
+    opcoes: [
+      { l:'A', t:'Menos de 90 dias', v:'cedo' },
+      { l:'B', t:'Entre 90 dias e 1 ano', v:'ok' },
+      { l:'C', t:'Entre 1 e 2 anos', v:'ok' },
+      { l:'D', t:'Mais de 2 anos', v:'longo' },
+    ],
+    alertas: {
+      cedo: { tipo:'perigo', msg:'❌ O programa exige mínimo de 90 dias de atraso. Sua dívida é recente demais para se enquadrar agora.' },
+      ok: { tipo:'ok', msg:'✅ Esse prazo está dentro do previsto.' },
+      longo: { tipo:'atencao', msg:'⚠️ Dívidas com mais de 2 anos podem ter regras específicas. Aguarde a regulamentação para confirmar — e verifique se a dívida já prescreveu ou está próxima da prescrição.' },
+    }
+  },
+  {
+    id: 'negativado',
+    texto: 'Seu nome está negativado (SPC/Serasa)?',
+    sub: 'Negativação é quando a dívida é registrada nos órgãos de proteção ao crédito.',
+    opcoes: [
+      { l:'A', t:'Sim, meu nome está negativado', v:'sim' },
+      { l:'B', t:'Não está negativado', v:'nao' },
+      { l:'C', t:'Não sei / nunca consultei', v:'naosabe' },
+    ],
+    alertas: {
+      sim: { tipo:'info', msg:'💡 A negativação é um dos critérios do programa. Ao renegociar, a dívida tende a ser regularizada — mas confirme isso antes de assinar qualquer acordo.' },
+      nao: { tipo:'atencao', msg:'⚠️ Se você ainda não está negativada mas tem dívidas em atraso, pode haver estratégias mais interessantes do que o Desenrola para o seu caso.' },
+      naosabe: { tipo:'info', msg:'💡 Consulte gratuitamente pelo app do Serasa ou pelo site consumidor.gov.br antes de tomar qualquer decisão.' },
+    }
+  },
+  {
+    id: 'fgts',
+    texto: 'Você tem saldo disponível no FGTS?',
+    sub: 'O Desenrola permite usar até 20% do saldo do FGTS para abater a dívida — o valor vai direto pro banco, sem passar pela sua conta.',
+    opcoes: [
+      { l:'A', t:'Sim, tenho saldo e quero usar', v:'sim_usar' },
+      { l:'B', t:'Sim, mas prefiro não usar o FGTS', v:'sim_nao' },
+      { l:'C', t:'Não tenho saldo ou é muito baixo', v:'nao' },
+      { l:'D', t:'Não sei qual é meu saldo', v:'naosabe' },
+    ],
+    alertas: {
+      sim_usar: { tipo:'ok', msg:'✅ Ótimo! O FGTS pode reduzir bastante o valor renegociado. Lembre-se: o dinheiro vai direto pro banco credor — não passa pela sua conta.' },
+      sim_nao: { tipo:'info', msg:'💡 Você não é obrigada a usar o FGTS. Mas dependendo do tamanho da dívida, pode ser uma estratégia para conseguir condições ainda melhores.' },
+      nao: { tipo:'atencao', msg:'⚠️ Sem FGTS você ainda pode participar, mas não terá esse recurso como aliado.' },
+      naosabe: { tipo:'info', msg:'💡 Consulte seu saldo pelo app FGTS da Caixa Econômica Federal antes de aderir — pode fazer diferença na sua negociação.' },
+    }
+  },
+  {
+    id: 'tentou_negociar',
+    texto: 'Você já tentou negociar essa dívida com o banco antes?',
+    sub: 'Seja por telefone, aplicativo, agência ou qualquer outro canal.',
+    opcoes: [
+      { l:'A', t:'Não, nunca tentei', v:'nao' },
+      { l:'B', t:'Sim, tentei mas as condições eram ruins', v:'tentou_ruim' },
+      { l:'C', t:'Sim, recebi proposta mas não aceitei', v:'proposta' },
+      { l:'D', t:'Já fiz um acordo antes e não consegui pagar', v:'acordo_quebrado' },
+    ],
+    alertas: {
+      nao: { tipo:'info', msg:'💡 O Desenrola pode ser uma boa primeira oportunidade — mas compare sempre com o que o banco ofereceria diretamente.' },
+      tentou_ruim: { tipo:'ok', msg:'✅ O Desenrola tende a oferecer condições muito melhores do que a negociação direta normal, justamente por ter respaldo do governo.' },
+      proposta: { tipo:'atencao', msg:'⚠️ Se você já recebeu proposta do banco, compare com o que o Desenrola vai oferecer antes de decidir. Não aceite a primeira que aparecer.' },
+      acordo_quebrado: { tipo:'atencao', msg:'⚠️ Acordos quebrados anteriormente podem influenciar as condições oferecidas. Verifique se há restrições no seu histórico com o banco.' },
+    }
+  },
+  {
+    id: 'bets',
+    texto: 'Você usa plataformas de aposta online (bets)?',
+    sub: 'Quem aderir ao Desenrola fica bloqueado por 1 ano em TODAS as plataformas de aposta — essa é uma condição obrigatória do programa.',
+    opcoes: [
+      { l:'A', t:'Não uso bets', v:'nao' },
+      { l:'B', t:'Uso às vezes, mas consigo abrir mão', v:'ok' },
+      { l:'C', t:'Uso com frequência e não quero ser bloqueada', v:'problema' },
+    ],
+    alertas: {
+      nao: null,
+      ok: { tipo:'info', msg:'💡 O bloqueio é automático e vale por 12 meses após a adesão. Não há como optar por não ser bloqueada.' },
+      problema: { tipo:'perigo', msg:'🚨 O bloqueio de 1 ano em bets é obrigatório para todos que aderirem — não há exceção. Se isso for um impedimento real, repense a adesão ao programa.' },
+    }
+  },
+  {
+    id: 'juros',
+    texto: 'Você sabe qual é a taxa de juros do seu contrato atual?',
+    sub: 'Essa informação está no contrato, no extrato bancário ou no aplicativo do banco.',
+    opcoes: [
+      { l:'A', t:'Sim — os juros estão acima de 3% ao mês', v:'abusivo' },
+      { l:'B', t:'Sim — os juros estão entre 1% e 3% ao mês', v:'normal' },
+      { l:'C', t:'Não sei qual é a taxa', v:'naosabe' },
+      { l:'D', t:'Meu contrato é consignado (desconto em folha)', v:'consignado' },
+    ],
+    alertas: {
+      abusivo: { tipo:'perigo', msg:'🚨 Juros acima de 3% ao mês em cartão de crédito ou empréstimo pessoal podem configurar abusividade. Antes de aderir ao Desenrola, vale verificar se você tem direito à revisão do contrato — o que pode ser ainda mais vantajoso.' },
+      normal: { tipo:'ok', msg:'✅ Taxa dentro da faixa comum de mercado. O desconto do Desenrola pode ser uma boa saída.' },
+      naosabe: { tipo:'atencao', msg:'⚠️ Importante: antes de assinar qualquer acordo, solicite o extrato completo do contrato ao banco. Você tem direito a essa informação.' },
+      consignado: { tipo:'info', msg:'💡 O consignado tem taxas reguladas e menores — mas isso não impede que haja irregularidades como RMC não autorizado, seguros embutidos ou descontos indevidos.' },
+    }
+  },
+  {
+    id: 'contrato',
+    texto: 'Você suspeita de alguma irregularidade no seu contrato?',
+    sub: 'Cobranças que não reconhece, seguro que não pediu, contrato que não assinou, ou valores que não fecham.',
+    opcoes: [
+      { l:'A', t:'Não — minha dívida é legítima e reconheço tudo', v:'ok' },
+      { l:'B', t:'Tenho dúvidas sobre alguns valores ou cobranças', v:'duvida' },
+      { l:'C', t:'Suspeito de cobrança irregular ou seguro indevido', v:'irregular' },
+      { l:'D', t:'Contratei sem entender ou fui induzida a assinar', v:'fraude' },
+    ],
+    alertas: {
+      ok: { tipo:'ok', msg:'✅ Ótimo. Com o contrato regular, o Desenrola pode ser uma boa opção para você.' },
+      duvida: { tipo:'atencao', msg:'⚠️ Dúvidas sobre valores merecem atenção antes de assinar qualquer acordo. Um acordo mal feito encerra seu direito de questionar o banco depois.' },
+      irregular: { tipo:'perigo', msg:'🚨 Cobranças irregulares e seguros não solicitados são causas comuns de revisão judicial. Aderir ao Desenrola sem verificar isso pode fazer você perder o direito de reaver esses valores.' },
+      fraude: { tipo:'perigo', msg:'🚨 Se você foi induzida a contratar ou não reconhece o contrato, isso pode configurar vício de consentimento ou até fraude — o que abre possibilidade de anulação judicial. Não assine nada antes de uma análise jurídica.' },
+    }
+  },
+];
+
+let atual = 0;
+let respostas = {};
+
+function renderPergunta() {
+  const p = perguntas[atual];
+  const total = perguntas.length;
+  const pct = Math.round((atual / total) * 100);
+
+  document.getElementById('progressLabel').textContent = `Pergunta ${atual+1} de ${total}`;
+  document.getElementById('progressPct').textContent = `${pct}%`;
+  document.getElementById('progressFill').style.width = `${pct}%`;
+  document.getElementById('stepNum').textContent = `Passo ${String(atual+1).padStart(2,'0')} de ${total}`;
+  document.getElementById('pergunta').textContent = p.texto;
+  document.getElementById('perguntaSub').textContent = p.sub;
+
+  const opcDiv = document.getElementById('opcoes');
+  opcDiv.innerHTML = '';
+  p.opcoes.forEach((op, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'opcao';
+    btn.innerHTML = `<span class="opcao-letra">${op.l}</span><span>${op.t}</span>`;
+    btn.onclick = () => selecionar(i, op.v, p.alertas);
+    opcDiv.appendChild(btn);
+  });
+
+  document.getElementById('alertaInline').className = 'alerta-inline';
+  document.getElementById('alertaInline').textContent = '';
+  document.getElementById('btnProximo').className = 'btn-proximo';
+
+  const card = document.getElementById('quizCard');
+  card.style.animation = 'none';
+  card.offsetHeight;
+  card.style.animation = 'slideIn 0.35s cubic-bezier(0.4,0,0.2,1) both';
+}
+
+function selecionar(idx, valor, alertas) {
+  respostas[perguntas[atual].id] = valor;
+  document.querySelectorAll('.opcao').forEach((b,i) => {
+    b.className = i===idx ? 'opcao selecionada' : 'opcao';
+  });
+
+  const alerta = alertas ? alertas[valor] : null;
+  const alertaEl = document.getElementById('alertaInline');
+  if (alerta) {
+    alertaEl.className = `alerta-inline ${alerta.tipo} show`;
+    alertaEl.textContent = alerta.msg;
+  } else {
+    alertaEl.className = 'alerta-inline';
+  }
+
+  const btn = document.getElementById('btnProximo');
+  btn.className = 'btn-proximo visivel';
+  btn.textContent = atual < perguntas.length-1 ? 'Próxima pergunta →' : 'Ver minha análise completa →';
+}
+
+function avancar() {
+  if (atual < perguntas.length-1) {
+    atual++;
+    renderPergunta();
+    window.scrollTo({top:0, behavior:'smooth'});
+  } else {
+    mostrarResultado();
+  }
+}
+
+function calcularResultado() {
+  const r = respostas;
+  let pontos_risco = 0;
+  let pontos_atencao = 0;
+  let flags = [];
+
+  // Riscos críticos — vermelho direto
+  if (r.renda === 'fora') flags.push('renda_fora');
+  if (r.tipo_divida === 'consignado') flags.push('consignado');
+  if (r.atraso === 'cedo') flags.push('atraso_cedo');
+  if (r.contrato === 'fraude') flags.push('fraude');
+  if (r.contrato === 'irregular') flags.push('irregular');
+  if (r.juros === 'abusivo') flags.push('juros_abusivos');
+
+  // Atenção — amarelo
+  if (r.renda === 'atencao') flags.push('renda_atencao');
+  if (r.tipo_divida === 'fies') flags.push('fies');
+  if (r.atraso === 'longo') flags.push('atraso_longo');
+  if (r.bets === 'problema') flags.push('bets');
+  if (r.contrato === 'duvida') flags.push('duvida_contrato');
+  if (r.valor_divida === 'muito_alto') flags.push('valor_alto');
+  if (r.acordo_quebrado === 'acordo_quebrado') flags.push('acordo_quebrado');
+
+  const criticos = ['renda_fora','consignado','atraso_cedo','fraude','irregular','juros_abusivos'];
+  const temCritico = flags.some(f => criticos.includes(f));
+
+  if (temCritico) return { tipo: 'vermelho', flags };
+
+  const atencoes = ['renda_atencao','fies','atraso_longo','bets','duvida_contrato','valor_alto','acordo_quebrado'];
+  const temAtencao = flags.some(f => atencoes.includes(f));
+
+  if (temAtencao) return { tipo: 'amarelo', flags };
+
+  return { tipo: 'verde', flags };
+}
+
+function gerarDiagnostico(flags, r) {
+  const itens = [];
+
+  // Renda
+  if (flags.includes('renda_fora')) {
+    itens.push({ tipo:'risco', icon:'❌', titulo:'Renda fora do limite', texto:'Sua renda está acima do permitido pelo programa.' });
+  } else if (flags.includes('renda_atencao')) {
+    itens.push({ tipo:'aviso', icon:'⚠️', titulo:'Renda no limite', texto:'Você está próxima do teto — aguarde a regulamentação oficial.' });
+  } else {
+    itens.push({ tipo:'ok', icon:'✅', titulo:'Renda dentro do limite', texto:'Seu perfil de renda está alinhado com o programa.' });
+  }
+
+  // Tipo de dívida
+  if (flags.includes('consignado')) {
+    itens.push({ tipo:'risco', icon:'❌', titulo:'Consignado não entra no Desenrola', texto:'Mas pode haver direito à revisão judicial do contrato.' });
+  } else if (flags.includes('fies')) {
+    itens.push({ tipo:'aviso', icon:'⚠️', titulo:'FIES — condição especial', texto:'Entra apenas se você já está no mercado de trabalho.' });
+  } else {
+    itens.push({ tipo:'ok', icon:'✅', titulo:'Tipo de dívida elegível', texto:'Esse tipo de dívida está previsto no programa.' });
+  }
+
+  // Prazo de atraso
+  if (flags.includes('atraso_cedo')) {
+    itens.push({ tipo:'risco', icon:'❌', titulo:'Dívida recente demais', texto:'Menos de 90 dias — ainda não se enquadra no prazo mínimo.' });
+  } else if (flags.includes('atraso_longo')) {
+    itens.push({ tipo:'aviso', icon:'⚠️', titulo:'Dívida com mais de 2 anos', texto:'Pode haver regras específicas — verifique também a prescrição.' });
+  } else {
+    itens.push({ tipo:'ok', icon:'✅', titulo:'Prazo de atraso adequado', texto:'O tempo de inadimplência está dentro do previsto.' });
+  }
+
+  // Contrato
+  if (flags.includes('fraude')) {
+    itens.push({ tipo:'risco', icon:'🚨', titulo:'Possível vício de consentimento', texto:'Não assine nada antes de análise jurídica — pode haver direito de anulação.' });
+  } else if (flags.includes('irregular')) {
+    itens.push({ tipo:'risco', icon:'🚨', titulo:'Irregularidade no contrato', texto:'Aderir ao Desenrola pode encerrar seu direito de questionar o banco.' });
+  } else if (flags.includes('duvida_contrato')) {
+    itens.push({ tipo:'aviso', icon:'⚠️', titulo:'Dúvidas sobre o contrato', texto:'Verifique o extrato completo antes de assinar qualquer acordo.' });
+  } else {
+    itens.push({ tipo:'ok', icon:'✅', titulo:'Contrato sem irregularidade aparente', texto:'Sua dívida parece legítima — Desenrola pode ser boa opção.' });
+  }
+
+  // Juros
+  if (flags.includes('juros_abusivos')) {
+    itens.push({ tipo:'risco', icon:'🚨', titulo:'Juros possivelmente abusivos', texto:'Juros acima de 3% ao mês podem dar direito à revisão judicial.' });
+  }
+
+  // Bets
+  if (flags.includes('bets')) {
+    itens.push({ tipo:'aviso', icon:'⚠️', titulo:'Bloqueio de bets por 1 ano', texto:'Condição obrigatória — não há como optar por não ser bloqueada.' });
+  }
+
+  // FGTS
+  if (r.fgts === 'sim_usar') {
+    itens.push({ tipo:'info', icon:'💰', titulo:'FGTS disponível como aliado', texto:'Você pode usar até 20% do saldo para abater a dívida.' });
+  }
+
+  return itens;
+}
+
+function gerarPassos(tipo, flags, r) {
+  if (tipo === 'verde') {
+    return [
+      'Aguarde a abertura oficial da plataforma de renegociação nos próximos dias',
+      'Acesse o app ou site do seu banco e busque a opção Desenrola Brasil',
+      r.fgts === 'sim_usar' ? 'Tenha em mãos seu saldo do FGTS — o banco vai solicitar autorização de uso' : 'Compare a proposta com o valor original da dívida e certifique que o desconto é real',
+      'Leia todas as condições do acordo antes de assinar — prazo, parcelas e taxa final',
+      'Guarde o comprovante e o contrato do acordo assinado',
+      'Após renegociar, solicite a baixa da negativação por escrito',
+    ];
+  }
+
+  if (tipo === 'amarelo') {
+    return [
+      'Aguarde a regulamentação oficial — ainda há detalhes a serem confirmados',
+      flags.includes('duvida_contrato') ? 'Solicite o extrato completo do seu contrato ao banco antes de qualquer decisão' : 'Reúna todos os documentos da dívida: contrato, extratos e comprovantes de pagamento',
+      'Consulte seu saldo do FGTS pelo app Caixa — mesmo que não vá usar agora',
+      'Quando a plataforma abrir, simule a proposta antes de confirmar qualquer acordo',
+      'Compare: o que o Desenrola oferece vs. o que você teria direito juridicamente',
+      'Em caso de dúvida, procure orientação jurídica antes de assinar',
+    ];
+  }
+
+  // Vermelho
+  const passos = [
+    'NÃO assine nenhum acordo com o banco antes de entender sua situação real',
+  ];
+
+  if (flags.includes('consignado')) {
+    passos.push('Crédito consignado com irregularidades pode dar direito à revisão e devolução de valores');
+    passos.push('Verifique se há RMC não autorizado, seguros embutidos ou descontos indevidos no contracheque');
+  }
+
+  if (flags.includes('juros_abusivos') || flags.includes('irregular') || flags.includes('fraude')) {
+    passos.push('Solicite o extrato completo do contrato ao banco — você tem direito a essa informação');
+    passos.push('Guarde todos os comprovantes de pagamento já realizados');
+    passos.push('Uma ação de revisão contratual pode resultar em devolução de valores — não apenas desconto');
+  }
+
+  passos.push('Procure orientação jurídica especializada em direito bancário do consumidor');
+  passos.push('Não deixe o banco te pressionar com prazo — você tem direito de analisar com calma');
+
+  return passos;
+}
+
+function mostrarResultado() {
+  document.getElementById('header').style.display = 'none';
+  document.getElementById('progressWrap').style.display = 'none';
+  document.getElementById('quizCard').style.display = 'none';
+
+  const { tipo, flags } = calcularResultado();
+  const r = respostas;
+  const resultDiv = document.getElementById('resultado');
+  resultDiv.className = 'resultado show';
+
+  const titulos = {
+    verde:   { emoji:'✅', titulo:'Seu perfil tem boas chances de se enquadrar no Desenrola', sub:'Com base nas suas respostas, você está alinhada com os critérios do programa. Mas leia atentamente as condições antes de assinar qualquer acordo.' },
+    amarelo: { emoji:'⚠️', titulo:'Você pode se enquadrar — mas há pontos que exigem atenção', sub:'Seu caso tem características que merecem análise cuidadosa antes de qualquer decisão. Não se apresse.' },
+    vermelho:{ emoji:'❌', titulo:'O Desenrola provavelmente não é a melhor saída para você', sub:'Com base nas suas respostas, seu caso exige uma estratégia diferente — e possivelmente mais vantajosa do que o programa oferece.' },
+  };
+
+  const c = titulos[tipo];
+  const diagnostico = gerarDiagnostico(flags, r);
+  const passos = gerarPassos(tipo, flags, r);
+
+  const avisoJuridico = (flags.includes('irregular') || flags.includes('fraude') || flags.includes('juros_abusivos'))
+    ? `<div class="aviso-juridico"><strong>🚨 Atenção importante:</strong> Identificamos características no seu caso que podem dar direito a uma ação judicial de revisão contratual. Aderir ao Desenrola sem verificar isso pode fazer você <strong>perder direitos mais valiosos</strong> do que o desconto oferecido. Procure orientação jurídica antes de assinar.</div>`
+    : '';
+
+  const fgtsBox = (r.fgts === 'sim_usar' && tipo !== 'vermelho')
+    ? `<div class="fgts-box">💰 <strong>Dica sobre o FGTS:</strong> Você pode usar até 20% do saldo. O valor vai direto para o banco credor — não passa pela sua conta. Tenha o app FGTS da Caixa instalado quando for fazer a renegociação.</div>`
+    : '';
+
+  resultDiv.innerHTML = `
+    <div class="resultado-topo ${tipo}">
+      <div class="resultado-emoji">${c.emoji}</div>
+      <div class="resultado-titulo">${c.titulo}</div>
+      <p class="resultado-sub">${c.sub}</p>
+    </div>
+    <div class="resultado-corpo">
+
+      <div class="secao">
+        <div class="secao-titulo">Seu diagnóstico completo</div>
+        <ul class="diagnostico-lista">
+          ${diagnostico.map(d => `
+            <li class="diagnostico-item ${d.tipo}">
+              <span class="diag-icone">${d.icon}</span>
+              <div class="diag-texto">
+                <strong>${d.titulo}</strong>
+                ${d.texto}
+              </div>
+            </li>
+          `).join('')}
+        </ul>
+      </div>
+
+      ${avisoJuridico}
+      ${fgtsBox}
+
+      <div class="secao">
+        <div class="secao-titulo">Seus próximos passos</div>
+        <ul class="passo-lista">
+          ${passos.map((p,i) => `
+            <li class="passo-item">
+              <div class="passo-num">${i+1}</div>
+              <span>${p}</span>
+            </li>
+          `).join('')}
+        </ul>
+      </div>
+
+      <div class="secao">
+        <div class="secao-titulo">${tipo === 'verde' ? 'Ficou com alguma dúvida?' : 'Quer entender melhor o seu caso?'}</div>
+        <a class="btn-whats" href="https://wa.me/5542999888281?text=Olá%20Dra.%20Lucielli%2C%20fiz%20a%20análise%20do%20Desenrola%20e%20gostaria%20de%20entender%20melhor%20o%20meu%20caso." target="_blank">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          Falar com a Dra. Lucielli no WhatsApp
+        </a>
+        <a class="btn-secundario" href="https://instagram.com/lucielliviola.adv" target="_blank">
+          📱 @lucielliviola.adv no Instagram
+        </a>
+      </div>
+
+      <div class="rodape">
+        Dra. Lucielli Viola · OAB/PR 100.553 · Direito Bancário do Consumidor<br>
+        <span style="color:#2a2a2a">Esta análise é orientativa e não substitui consulta jurídica formal. · Laranjeiras do Sul/PR</span>
+      </div>
+
+    </div>
+  `;
+
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+renderPergunta();
+</script>
+</body>
+</html>
